@@ -227,16 +227,31 @@
 #done
 
 # Create merge files also for subword-nmt
-#for F in data/en??/?bpe*; do echo $F; cut -d' ' -f1,2 $F > $F.nonu; don
+#for F in data/en??/?bpe*; do echo $F; cut -d' ' -f1,2 $F > $F.nonu; done
 
 # Do the training data also with BPE dropout
-for PAIR in ende enfr encs; do
-    for SIZE in 32k 16k 8k 4k 2k 1k {950..0..50}; do
-        CODES=data/$PAIR/wbpe${SIZE}.nonu
-        for FILE in data/$PAIR/train/*.wtok; do
-            echo $FILE
-            OUTFILE=${FILE:0:-5}.bpew${SIZE}drop
-            subword-nmt/apply_bpe.py -c $CODES --dropout 0.1 -i $FILE | sed 's/@@ / /g' > $OUTFILE
+#for PAIR in ende enfr encs; do
+#    for SIZE in 32k 16k 8k 4k 2k 1k {950..0..50}; do
+#        CODES=data/$PAIR/wbpe${SIZE}.nonu
+#        for FILE in data/$PAIR/train/*.wtok; do
+#            echo $FILE
+#            OUTFILE=${FILE:0:-5}.bpew${SIZE}drop
+#            subword-nmt/apply_bpe.py -c $CODES --dropout 0.1 -i $FILE | sed 's/@@ / /g' > $OUTFILE
+#        done
+#    done
+#done
+
+for TGT in de cs fr; do
+    PAIR=en${TGT}
+    for LNG in en $TGT; do
+        NOISY_FILE=data/$PAIR/test/$LNG.wtok.noisy
+        for NOISE in 0.{1..9} 1.0; do
+            ./sample_natural_noise.py charNMT-noise/noise/$LNG.natural $NOISE data/$PAIR/test/$LNG.wtok >> $NOISY_FILE
+        done
+        for SIZE in 32k 16k 8k 4k 2k 1k {950..0..50}; do
+            CODES=data/$PAIR/wbpe${SIZE}
+            ~/local/fastBPE/bin/fast applybpe $NOISY_FILE.$SIZE $NOISY_FILE $CODES
+            sed -i 's/@@ / /g' $NOISY_FILE.$SIZE
         done
     done
 done
