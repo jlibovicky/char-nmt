@@ -1,0 +1,3 @@
+[submodule "charNMT-noise"]
+	path = charNMT-noise
+	url = https://github.com/ybisk/charNMT-noise.git
