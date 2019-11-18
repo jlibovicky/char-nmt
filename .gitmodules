@@ -1,3 +1,6 @@
 [submodule "charNMT-noise"]
 	path = charNMT-noise
 	url = https://github.com/ybisk/charNMT-noise.git
+[submodule "meteor"]
+	path = meteor
+	url = https://github.com/cmu-mtlab/meteor
